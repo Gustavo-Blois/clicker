@@ -166,7 +166,7 @@ void moveRight(block board[LEVEL_SIZE_Y][LEVEL_SIZE_X],Player *p1){
 
 int find_open_thread_index(int threads[N_THREADS]){
     for(int i = 0; i < N_THREADS; i++){
-        if (threads[i] == NULL){
+        if (threads[i] == 0){
             return i;
         }
     }
@@ -174,7 +174,7 @@ int find_open_thread_index(int threads[N_THREADS]){
 }
 
 void * imprime_thread(void* numero_thread){
-    printf("Alocada a thread %d\n",(int*) numero_thread);
+    printf("Alocada a thread %ld\n",(long) numero_thread);
 }
 
 
@@ -196,6 +196,26 @@ int main(){
     while(!WindowShouldClose()){
         render(map2,&p1,customer_buffer);
         time_t current_time = time(NULL);
+
+        
+        if (IsKeyPressed('Q')){
+            CloseWindow();
+            break;
+        }
+
+        if (GAME_OVER) {continue;}
+        if (IsKeyPressed('W')){
+            moveUp(map2,&p1);
+        }
+        if (IsKeyPressed('S')){
+            moveDown(map2,&p1);
+        }
+        if (IsKeyPressed('A')){
+            moveLeft(map2,&p1);
+        }
+        if (IsKeyPressed('D')){
+            moveRight(map2,&p1);
+        }
         if (difftime(current_time, initial_time) >= 2.0){
             initial_time = current_time;
             int customer_thread_id = find_open_thread_index(customer_buffer);
@@ -210,24 +230,8 @@ int main(){
 
             }
             printf("Se passaram 10 segundos\n");
-        }
-        if (IsKeyPressed('Q')){
-            CloseWindow();
-            break;
-        }
-        if (IsKeyPressed('W')){
-            moveUp(map2,&p1);
-        }
-        if (IsKeyPressed('S')){
-            moveDown(map2,&p1);
-        }
-        if (IsKeyPressed('A')){
-            moveLeft(map2,&p1);
-        }
-        if (IsKeyPressed('D')){
-            moveRight(map2,&p1);
-        }
     }
+}
 
     return 0;
 }
