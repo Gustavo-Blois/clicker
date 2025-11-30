@@ -7,6 +7,8 @@ LDFLAGS = -L$(RAYLIB_DIR)/lib \
           -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 \
           -Wl,-rpath,'$$ORIGIN/../external/raylib-5.5_linux_amd64/lib'
 
+IN = main.c list.c
+
 RAYLIB ?= ./external/raylib-5.5/src/
 
 .PHONY: all run clean nix
@@ -14,10 +16,10 @@ RAYLIB ?= ./external/raylib-5.5/src/
 all: $(TARGET)
 
 $(TARGET): main.c | $(TARGET_DIR)
-	gcc main.c $(CFLAGS) -o $(TARGET) $(LDFLAGS)
+	gcc $(IN) $(CFLAGS) -o $(TARGET) $(LDFLAGS)
 
 debug: main.c | $(TARGET_DIR)
-	gcc main.c $(FLAGS) -o $(TARGET) $(LDFLAGS) -g
+	gcc $(IN) $(FLAGS) -o $(TARGET) $(LDFLAGS) -g
 
 $(TARGET_DIR):
 	mkdir -p $(TARGET_DIR)
