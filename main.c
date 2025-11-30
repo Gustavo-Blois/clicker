@@ -13,8 +13,9 @@
 // DLVR: deliver (onde entregamos os pedidos)
 typedef enum block{
 WALL,
-STOVE,
-CTBD,
+BRED,
+BBLUE,
+BYELL,
 FLOR,
 DLVR,
 } block;
@@ -26,13 +27,14 @@ typedef struct pos_st {
 
 typedef struct player_st{
     Pos pos;
+    short int color;
 } Player;
 
 typedef struct customer_st{
     Pos pos;
 } Customer;
 
-#define LEVEL_SIZE_Y 11
+#define LEVEL_SIZE_Y 12
 #define LEVEL_SIZE_X 10
 #define N_THREADS LEVEL_SIZE_X
 #define screenHeight 500
@@ -66,25 +68,25 @@ for (int y = 0; y < LEVEL_SIZE_Y; y++) {
                     (Color){50, 50, 50, 255}
                 );
                 break;
-            case WALL:
+            case BYELL:
                 DrawRectangleV(
                     (Vector2){ sizeofsquare.x * x, sizeofsquare.y * y },
                     sizeofsquare,
-                    (Color){150, 150, 150, 255}
+                    YELLOW
                 );
                 break;
-            case CTBD:
+            case BRED:
                 DrawRectangleV(
                     (Vector2){ sizeofsquare.x * x, sizeofsquare.y * y },
                     sizeofsquare,
-                    (Color){255, 255, 255, 255}
+                    RED
                 );
                 break;
-            case STOVE:
+            case BBLUE:
                 DrawRectangleV(
                     (Vector2){ sizeofsquare.x * x, sizeofsquare.y * y },
                     sizeofsquare,
-                    (Color){50, 50, 255, 255}
+                    BLUE
                 );
                 break;
             case DLVR:
@@ -110,7 +112,32 @@ for (int y = 0; y < LEVEL_SIZE_Y; y++) {
         DrawLineV((Vector2){0, i*sizeofsquare.y}, (Vector2){screenWidth, i*sizeofsquare.y}, LIGHTGRAY);
     }
 
-    DrawRectangleV((Vector2){sizeofsquare.x*p1->pos.x,sizeofsquare.y*p1->pos.y},sizeofsquare,RED);
+    switch(p1->color){
+        case(0b000):
+            DrawRectangleV((Vector2){sizeofsquare.x*p1->pos.x,sizeofsquare.y*p1->pos.y},sizeofsquare,BLACK);
+            break;
+        case(0b001):
+            DrawRectangleV((Vector2){sizeofsquare.x*p1->pos.x,sizeofsquare.y*p1->pos.y},sizeofsquare,BLUE);
+            break;
+        case(0b010):
+            DrawRectangleV((Vector2){sizeofsquare.x*p1->pos.x,sizeofsquare.y*p1->pos.y},sizeofsquare,YELLOW);
+            break;
+        case(0b011):
+            DrawRectangleV((Vector2){sizeofsquare.x*p1->pos.x,sizeofsquare.y*p1->pos.y},sizeofsquare,GREEN);
+            break;
+        case(0b100):
+            DrawRectangleV((Vector2){sizeofsquare.x*p1->pos.x,sizeofsquare.y*p1->pos.y},sizeofsquare,RED);
+            break;
+        case(0b101):
+            DrawRectangleV((Vector2){sizeofsquare.x*p1->pos.x,sizeofsquare.y*p1->pos.y},sizeofsquare,PURPLE);
+            break;
+        case(0b110):
+            DrawRectangleV((Vector2){sizeofsquare.x*p1->pos.x,sizeofsquare.y*p1->pos.y},sizeofsquare,ORANGE);
+            break;
+        case(0b111):
+            DrawRectangleV((Vector2){sizeofsquare.x*p1->pos.x,sizeofsquare.y*p1->pos.y},sizeofsquare,WHITE);
+            break;
+    }
 
 
 
@@ -119,7 +146,8 @@ for (int y = 0; y < LEVEL_SIZE_Y; y++) {
 
 }
 
-int position_player(block board[LEVEL_SIZE_Y][LEVEL_SIZE_X],Player *p1){
+int init_player(block board[LEVEL_SIZE_Y][LEVEL_SIZE_X],Player *p1){
+    p1->color = 0b000;
     for(int i = 1; i < LEVEL_SIZE_Y; i++){
         for(int j = 0; j < LEVEL_SIZE_X; j++){
             if (board[i][j] == FLOR) {
@@ -132,10 +160,36 @@ int position_player(block board[LEVEL_SIZE_Y][LEVEL_SIZE_X],Player *p1){
     return -1;
 }
 
+void update_player_color(Player *p1, block color){
+    switch(color){
+        case(BRED):
+            p1->color = (p1->color & 0b111) | 0b100;
+            break;
+        case(BYELL):
+            p1->color = (p1->color & 0b111) | 0b010;
+            break;
+        case(BBLUE):
+            p1->color = (p1->color & 0b111) | 0b001;
+            break;
+        default:
+            break;
+    }
+
+}
+void deliver(Player *p1){
+    p1->color = 0x000;
+}
+
 void moveUp(block board[LEVEL_SIZE_Y][LEVEL_SIZE_X],Player *p1){
     if (p1->pos.y < LEVEL_SIZE_Y){
         if (board[p1->pos.y - 1][p1->pos.x] == FLOR){
             p1->pos.y -= 1;
+        }
+        else if (board[p1->pos.y - 1][p1->pos.x] == DLVR){
+            deliver(p1);
+        }
+        else if (board[p1->pos.y - 1][p1->pos.x] != WALL){
+            update_player_color(p1, board[p1->pos.y - 1][p1->pos.x]);
         }
     }
 }
@@ -145,6 +199,12 @@ void moveDown(block board[LEVEL_SIZE_Y][LEVEL_SIZE_X],Player *p1){
         if (board[p1->pos.y + 1][p1->pos.x] == FLOR){
             p1->pos.y += 1;
         }
+        else if (board[p1->pos.y + 1][p1->pos.x] == DLVR){
+            deliver(p1);
+        }
+        else if (board[p1->pos.y + 1][p1->pos.x] != WALL){
+            update_player_color(p1, board[p1->pos.y + 1][p1->pos.x]);
+        }
     }
 }
 
@@ -153,6 +213,12 @@ void moveLeft(block board[LEVEL_SIZE_Y][LEVEL_SIZE_X],Player *p1){
         if (board[p1->pos.y][p1->pos.x - 1] == FLOR){
             p1->pos.x -= 1;
         }
+        else if (board[p1->pos.y][p1->pos.x -1] == DLVR){
+            deliver(p1);
+        }
+        else if (board[p1->pos.y ][p1->pos.x-1] != WALL){
+            update_player_color(p1, board[p1->pos.y][p1->pos.x -1]);
+        }
     }
 }
 
@@ -160,6 +226,12 @@ void moveRight(block board[LEVEL_SIZE_Y][LEVEL_SIZE_X],Player *p1){
     if (p1->pos.x < LEVEL_SIZE_X){
         if (board[p1->pos.y][p1->pos.x + 1] == FLOR){
             p1->pos.x += 1;
+        }
+        else if (board[p1->pos.y][p1->pos.x +1] == DLVR){
+            deliver(p1);
+        }
+        else if (board[p1->pos.y ][p1->pos.x+1] != WALL){
+            update_player_color(p1, board[p1->pos.y][p1->pos.x +1]);
         }
     }
 }
@@ -186,7 +258,7 @@ int main(){
     Player p1;
     int customer_buffer[N_THREADS] = {0};
     pthread_t customer_threads[N_THREADS];
-    if(position_player(map2, &p1) < 0){
+    if(init_player(map2, &p1) < 0){
         printf("Could not position player\n");
         return -1;
     }
