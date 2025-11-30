@@ -16,11 +16,11 @@ all: $(TARGET)
 $(TARGET): main.c | $(TARGET_DIR)
 	gcc main.c $(CFLAGS) -o $(TARGET) $(LDFLAGS)
 
+debug: main.c | $(TARGET_DIR)
+	gcc main.c $(FLAGS) -o $(TARGET) $(LDFLAGS) -g
+
 $(TARGET_DIR):
 	mkdir -p $(TARGET_DIR)
-
-nix:
-	gcc main.c -I$(RAYLIB)include -L$(RAYLIB)lib -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 
 
 run: $(TARGET)
 	./$(TARGET)

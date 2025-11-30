@@ -31,6 +31,8 @@
 
 					pkgs.raylib
 
+					pkgs.gdb
+
           # Uncomment the line below if you want to build Raylib with web support
           # pkgs.emscripten
         ];
