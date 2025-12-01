@@ -78,13 +78,10 @@ O topo da tela mostra os pedidos ativos (clientes) e o tempo restante de cada um
 O jogador anda sobre blocos coloridos para formar uma cor (combinação por bits).  
 Na área de entrega, se a cor do jogador corresponder a algum pedido, esse cliente é atendido.  
 Se o tempo acabar e o pedido não for atendido, o cliente vai embora insatisfeito, o jogador perde pontos e acumula erros.  
-Ao atingir o limite de erros (2), o jogo entra em estado de game over e mostra a pontuação final.
+Ao atingir o limite de erros (3), o jogo entra em estado de game over e mostra a pontuação final.
 
-Local para screenshot da tela principal:
 
 ![Tela principal](screenshots/tela-principal.png)
-
-Local para screenshot de game over:
 
 ![Game over](screenshots/game-over.png)
 
@@ -187,8 +184,6 @@ sem_post(&orders_sem);
 ```
 
 O semáforo garante exclusão mútua na lista de pedidos e no estado global, evitando condições de corrida entre produtor, consumidores e a thread principal.
-
-Local para screenshot destacando a fila de pedidos:
 
 ![Fila de pedidos](screenshots/fila-pedidos.png)
 
